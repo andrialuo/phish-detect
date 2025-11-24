@@ -5,24 +5,19 @@ Rule engine for phishing detection.
 
 It expects a parsed_email dict with (you can adapt this to your parser):
 
-parsed_email = {
-    "from_addr": "Display Name <someone@example.com>",  # original From header
-    "from_domain": "example.com",                       # domain part of From
-    "reply_to_domain": "reply.com" or None,
-    "message_id": "<...>" or None,
-    "received_headers": [ "Received: ...", ... ],
+{
+    "from_addr": row["sender"],
+    "from_domain": extract domain from sender,
+    "reply_to_domain": None,   # your dataset doesn’t have this
+    "message_id": None,        # also missing
+    "received_headers": [],    # missing
 
-    "body_text": "...",                                 # plain-text body
-    "html": "...",                                      # optional HTML body or ""
-    "urls": [                                           # list of URL dicts
-        {"href": "https://example.com/login", "text": "Click here"},
-        # ...
-    ],
-    "attachments": [                                    # list of attachment dicts
-        {"filename": "invoice.docm"},
-        # ...
-    ],
+    "body_text": row["body"],
+    "html": "",
+    "urls": convert row["urls"] from string to list,
+    "attachments": [],
 }
+
 
 run_rules(parsed_email) returns:
     total_score: float
