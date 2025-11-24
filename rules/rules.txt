@@ -2,5 +2,4 @@
 2. Domain/Address
 3. URL/Link
 4. Body Language/Content
-5. Attachment
-6. Structure
+5. Attachment (maybe)
