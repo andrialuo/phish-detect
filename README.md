@@ -1,5 +1,4 @@
 # CSE 4303 Final Project: Prevent Email Phishing Tool
-CSE 4303 Final Project
 
 ## Background
 Phishing remains one of the most prevalent and effective attack vectors in computer security. In this project, we aim to explore and experiment with phishing email detection by analyzing how real phishing attempts are crafted and delivered. Phishing campaigns often rely on spoofed sender domains, manipulated email headers, obfuscated URLs, and malicious attachments, and many existing tools focus on only one of these components at a time. Prior research shows that combining multiple features of an email, including header metadata, embedded URLs, and textual content, can significantly improve detection accuracy. A key reason we are pursuing this project is that effective cyber defense requires a deep understanding of how phishing attacks operate in practice. By building a hybrid detection system and studying real-world phishing techniques, we hope to gain insight into both the offensive and defensive sides of email security.
