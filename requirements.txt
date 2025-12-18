@@ -1,0 +1,11 @@
+joblib
+numpy
+pandas
+scikit-learn
+matplotlib
+
+# for eml support and cli colors (possible implementation)
+email-validator
+beautifulsoup4
+tldextract
+colorama
