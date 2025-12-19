@@ -5,5 +5,5 @@ Phishing remains one of the most prevalent and effective attack vectors in compu
 
 ## Setup
 - clone repo
-- run python app.py
+- run `python app.py`
 - open tool locally 
