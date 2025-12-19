@@ -366,9 +366,9 @@ RuleFn = Callable[[Dict], RuleResult]
 
 ALL_RULES: List[RuleFn] = [
     # 1. Header / Sender Authenticity
-    rule_missing_message_id,
-    rule_few_received_headers,
-    rule_from_replyto_mismatch,
+    # rule_missing_message_id,
+    # rule_few_received_headers,
+    # rule_from_replyto_mismatch,
 
     # 2. Domain / Address
     rule_suspicious_sender_tld,
@@ -386,9 +386,9 @@ ALL_RULES: List[RuleFn] = [
     rule_many_exclamation_marks,
 
     # 5. Attachment
-    rule_has_executable_attachment,
-    rule_has_macro_doc_attachment,
-    rule_has_suspicious_archive,
+    # rule_has_executable_attachment,
+    # rule_has_macro_doc_attachment,
+    # rule_has_suspicious_archive,
 ]
 
 
