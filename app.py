@@ -73,7 +73,7 @@ def analyze():
             ml_confidence = round(prob * 100, 2)
 
         # ---- Rule-based confidence (normalized to 0–100) ----
-        MAX_RULE_SCORE = 15.0
+        MAX_RULE_SCORE = 26.0
         rule_confidence = min((rule_score / MAX_RULE_SCORE) * 100, 100.0)
         rule_confidence = round(rule_confidence, 1)
 
