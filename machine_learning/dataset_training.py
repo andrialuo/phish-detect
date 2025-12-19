@@ -203,6 +203,58 @@ def splitDataset(df,y,testRatio=0.2):
     y_test=y[testIndices]
     return X_train, X_test, y_train, y_test
 
+def predict_single_email(sender, subject, body, w, mean, std):
+    df = pd.DataFrame([{
+        "sender": sender,
+        "subject": subject,
+        "body": body,
+        "label": 0  # dummy
+    }])
+
+    df = preprocess(df)
+    X = createFeatureMatrix(df).values
+
+    X_norm = (X - mean) / std
+    X_bias = np.hstack([np.ones((1, 1)), X_norm])
+
+    score = X_bias @ w
+    prob = 1 / (1 + np.exp(-score))
+
+    prob = float(prob[0])   # extract scalar
+    prob = max(min(prob, 1.0), 0.0)
+    return int(prob >= 0.5), prob, X[0]
+
+
+def explain_features(features):
+    reasons = []
+
+    # sender randomness
+    if features[1] > 0.3:
+        reasons.append("Sender address contains many digits or special characters")
+
+    # subject length
+    if features[2] > 50:
+        reasons.append("Subject line is unusually long")
+
+    # readability (high = complex)
+    if features[6] > 12:
+        reasons.append("Email body is unusually complex or hard to read")
+
+    # suspicious keywords
+    if features[7] > 1:
+        reasons.append("Email contains common phishing keywords (e.g. urgent, verify, login)")
+
+    # URLs present
+    if features[8] > 0:
+        reasons.append("Email contains one or more links")
+
+    # uncommon domains
+    if features[10] > 0:
+        reasons.append("Email links to uncommon or suspicious domains")
+
+    return reasons
+
+
 def run():
     df=loadEmailDataset("dataset/raw_dataset.csv") 
     df=preprocess(df)
@@ -223,6 +275,24 @@ def run():
     print("Testing binary error:", round(testError, 4))
 
     #code will need to be added to test when you input something in it tells you if it's phishing or not. for now just getting the error correct
+    import pickle
+    import os
+
+    os.makedirs("models", exist_ok=True)
+
+    mean = X_train.mean(axis=0)
+    std0 = X_train.std(axis=0)
+    std = np.where(std0 == 0, 1, std0)
+
+
+    with open("models/logreg_model.pkl", "wb") as f:
+        pickle.dump({
+            "weights": w,
+            "mean": mean,
+            "std": std
+        }, f)
+
+    print("Model saved to models/logreg_model.pkl")
 
 
 if __name__=="__main__":
