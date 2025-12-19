@@ -5,26 +5,134 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phishing Email Detector</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .ocean {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.10), transparent 35%),
+                radial-gradient(circle at 80% 30%, rgba(255,255,255,0.08), transparent 40%),
+                linear-gradient(180deg, #0b1d3a 0%, #06345a 45%, #031a2f 100%);
+        }
+
+        .light-rays {
+            position: fixed;
+            inset: -20vh -20vw;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(
+                    115deg,
+                    rgba(255,255,255,0.06) 0px,
+                    rgba(255,255,255,0.00) 120px,
+                    rgba(255,255,255,0.00) 240px
+                );
+            mix-blend-mode: overlay;
+            animation: drift 12s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(-2vw) translateY(0); }
+            50% { transform: translateX(2vw) translateY(1vh); }
+            100% { transform: translateX(-2vw) translateY(0); }
+        }
+
+        .bubbles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -10vh;
+            width: 10px;
+            height: 10px;
+            border: 2px solid rgba(255,255,255,0.22);
+            border-radius: 50%;
+            opacity: 0.0;
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(0) scale(0.9); opacity: 0.0; }
+            10% { opacity: 0.25; }
+            100% { transform: translateY(-120vh) scale(1.25); opacity: 0.0; }
+        }
+
+        .fish-layer {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .fish {
+            position: absolute;
+            font-size: 46px;
+            opacity: 0.16;
+            filter: blur(0.15px);
+            animation: swim linear infinite;
+        }
+
+        @keyframes swim {
+            0% { transform: translateX(calc(100vw + 180px)) translateY(0); }
+            100% { transform: translateX(-180px) translateY(0); }
+        }
+
+        .hook {
+            position: fixed;
+            top: -10px;
+            right: 14vw;
+            width: 2px;
+            height: 38vh;
+            background: rgba(255,255,255,0.25);
+            z-index: -1;
+            pointer-events: none;
+            transform-origin: top center;
+            animation: bob 4.5s ease-in-out infinite;
+        }
+
+        .hook::after {
+            content: "🪝";
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 30px;
+            opacity: 0.22;
+            filter: blur(0.2px);
+        }
+
+        @keyframes bob {
+            0% { transform: rotate(-2deg) translateY(0); }
+            50% { transform: rotate(2deg) translateY(10px); }
+            100% { transform: rotate(-2deg) translateY(0); }
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background: white;
+            background: rgba(255,255,255,0.92);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
             overflow: hidden;
+            backdrop-filter: blur(6px);
         }
 
         .header {
@@ -44,13 +152,9 @@
             opacity: 0.9;
         }
 
-        .content {
-            padding: 40px;
-        }
+        .content { padding: 40px; }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
+        .form-group { margin-bottom: 25px; }
 
         label {
             display: block;
@@ -59,8 +163,7 @@
             color: #333;
         }
 
-        input[type="text"],
-        textarea {
+        input[type="text"], textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -68,18 +171,15 @@
             font-size: 14px;
             font-family: inherit;
             transition: border-color 0.3s;
+            background: rgba(255,255,255,0.95);
         }
 
-        input[type="text"]:focus,
-        textarea:focus {
+        input[type="text"]:focus, textarea:focus {
             outline: none;
             border-color: #667eea;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
+        textarea { resize: vertical; min-height: 150px; }
 
         .btn-analyze {
             width: 100%;
@@ -114,25 +214,12 @@
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .result.phishing {
-            background: #fee;
-            border: 2px solid #f44336;
-        }
-
-        .result.legitimate {
-            background: #efe;
-            border: 2px solid #4caf50;
-        }
+        .result.phishing { background: #fee; border: 2px solid #f44336; }
+        .result.legitimate { background: #efe; border: 2px solid #4caf50; }
 
         .verdict {
             font-size: 1.8em;
@@ -140,13 +227,8 @@
             margin-bottom: 15px;
         }
 
-        .verdict.phishing {
-            color: #d32f2f;
-        }
-
-        .verdict.legitimate {
-            color: #388e3c;
-        }
+        .verdict.phishing { color: #d32f2f; }
+        .verdict.legitimate { color: #388e3c; }
 
         .confidence {
             font-size: 1.2em;
@@ -156,7 +238,7 @@
 
         .scores {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -180,9 +262,7 @@
             color: #333;
         }
 
-        .triggered-rules {
-            margin-top: 20px;
-        }
+        .triggered-rules { margin-top: 20px; }
 
         .triggered-rules h3 {
             margin-bottom: 12px;
@@ -197,27 +277,11 @@
             border-left: 4px solid #ff9800;
         }
 
-        .rule-item.critical {
-            border-left-color: #f44336;
-        }
+        .rule-item.high { border-left-color: #ff9800; }
+        .rule-item.medium { border-left-color: #ffc107; }
 
-        .rule-item.high {
-            border-left-color: #ff9800;
-        }
-
-        .rule-item.medium {
-            border-left-color: #ffc107;
-        }
-
-        .rule-name {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .rule-evidence {
-            color: #666;
-            font-size: 0.9em;
-        }
+        .rule-name { font-weight: 600; margin-bottom: 4px; }
+        .rule-evidence { color: #666; font-size: 0.9em; }
 
         .explanation {
             margin-top: 20px;
@@ -233,14 +297,11 @@
         .example-links {
             margin-top: 30px;
             padding: 20px;
-            background: #f5f5f5;
+            background: rgba(245,245,245,0.9);
             border-radius: 8px;
         }
 
-        .example-links h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
+        .example-links h3 { margin-bottom: 15px; color: #333; }
 
         .example-btn {
             display: inline-block;
@@ -249,20 +310,15 @@
             background: #667eea;
             color: white;
             border-radius: 5px;
-            text-decoration: none;
             font-size: 0.9em;
             transition: background 0.2s;
+            border: none;
+            cursor: pointer;
         }
 
-        .example-btn:hover {
-            background: #764ba2;
-        }
+        .example-btn:hover { background: #764ba2; }
 
-        .loading {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
+        .loading { text-align: center; padding: 20px; display: none; }
 
         .spinner {
             border: 3px solid #f3f3f3;
@@ -280,11 +336,35 @@
         }
     </style>
 </head>
+
 <body>
+    <div class="ocean"></div>
+    <div class="light-rays"></div>
+
+    <div class="bubbles">
+        <div class="bubble" style="left: 8%; animation-duration: 10s; animation-delay: -2s;"></div>
+        <div class="bubble" style="left: 22%; animation-duration: 13s; animation-delay: -6s;"></div>
+        <div class="bubble" style="left: 41%; animation-duration: 11s; animation-delay: -4s;"></div>
+        <div class="bubble" style="left: 63%; animation-duration: 15s; animation-delay: -9s;"></div>
+        <div class="bubble" style="left: 84%; animation-duration: 12s; animation-delay: -5s;"></div>
+    </div>
+
+    <div class="fish-layer">
+        <div class="fish" style="top: 14%; animation-duration: 18s; animation-delay: -3s;">🐟</div>
+        <div class="fish" style="top: 30%; animation-duration: 24s; animation-delay: -9s;">🐠</div>
+        <div class="fish" style="top: 46%; animation-duration: 28s; animation-delay: -7s;">🐡</div>
+        <div class="fish" style="top: 64%; animation-duration: 21s; animation-delay: -11s;">🦈</div>
+        <div class="fish" style="top: 80%; animation-duration: 32s; animation-delay: -14s;">🐟</div>
+        <div class="fish" style="top: 22%; animation-duration: 20s; animation-delay: -12s; font-size: 34px; opacity: 0.12;">🐟</div>
+        <div class="fish" style="top: 58%; animation-duration: 26s; animation-delay: -18s; font-size: 40px; opacity: 0.14;">🐠</div>
+    </div>
+
+    <div class="hook"></div>
+
     <div class="container">
         <div class="header">
             <h1>🛡️ Phishing Email Detector</h1>
-            <p>Analyze emails for potential phishing threats using AI and rule-based detection</p>
+            <p>Analyze emails for potential phishing threats using machine learning and rule-based detection</p>
         </div>
 
         <div class="content">
@@ -304,9 +384,7 @@
                     <textarea id="body" name="body" placeholder="Paste email body here..." required></textarea>
                 </div>
 
-                <button type="submit" class="btn-analyze" id="analyzeBtn">
-                    Analyze Email
-                </button>
+                <button type="submit" class="btn-analyze" id="analyzeBtn">Analyze Email</button>
             </form>
 
             <div class="loading" id="loading">
@@ -317,7 +395,7 @@
             <div class="result" id="result">
                 <div class="verdict" id="verdict"></div>
                 <div class="confidence" id="confidence"></div>
-                
+
                 <div class="scores">
                     <div class="score-box">
                         <div class="score-label">Rule-Based Score</div>
@@ -326,6 +404,10 @@
                     <div class="score-box">
                         <div class="score-label">ML Probability</div>
                         <div class="score-value" id="mlScore">-</div>
+                    </div>
+                    <div class="score-box">
+                        <div class="score-label">Combined Score</div>
+                        <div class="score-value" id="combinedScore">-</div>
                     </div>
                 </div>
 
@@ -339,8 +421,8 @@
 
             <div class="example-links">
                 <h3>Try Example Emails:</h3>
-                <button class="example-btn" onclick="loadPhishingExample()">Phishing Example</button>
-                <button class="example-btn" onclick="loadLegitExample()">Legitimate Example</button>
+                <button type="button" class="example-btn" onclick="loadPhishingExample()">Phishing Example</button>
+                <button type="button" class="example-btn" onclick="loadLegitExample()">Legitimate Example</button>
             </div>
         </div>
     </div>
@@ -348,25 +430,25 @@
     <script>
         document.getElementById('emailForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const btn = document.getElementById('analyzeBtn');
             const loading = document.getElementById('loading');
             const result = document.getElementById('result');
-            
+
             btn.disabled = true;
             loading.style.display = 'block';
             result.style.display = 'none';
-            
+
             const formData = new FormData(e.target);
-            
+
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     displayResult(data);
                 } else {
@@ -386,38 +468,36 @@
             const confidence = document.getElementById('confidence');
             const ruleScore = document.getElementById('ruleScore');
             const mlScore = document.getElementById('mlScore');
+            const combinedScore = document.getElementById('combinedScore');
             const explanation = document.getElementById('explanation');
             const triggeredRulesSection = document.getElementById('triggeredRulesSection');
             const triggeredRules = document.getElementById('triggeredRules');
-            
-            // Set verdict
+
             verdict.textContent = data.verdict === 'PHISHING' ? '⚠️ PHISHING DETECTED' : '✅ LEGITIMATE EMAIL';
             verdict.className = 'verdict ' + data.verdict.toLowerCase();
-            
-            // Set confidence
-            confidence.textContent = `Confidence: ${data.confidence}%`;
-            
-            // Set scores
-            ruleScore.textContent = `${data.rule_score}/100`;
-            mlScore.textContent = data.ml_score ? `${data.ml_score}%` : 'N/A';
-            
-            // Set explanation
-            explanation.textContent = data.explanation;
-            
-            // Display triggered rules
-            if (data.triggered_rules.length > 0) {
+
+            confidence.textContent = `Overall confidence: ${data.confidence}%`;
+
+            ruleScore.textContent = (data.rule_score !== undefined && data.rule_score !== null) ? `${data.rule_score}%` : 'N/A';
+            mlScore.textContent = (data.ml_score !== undefined && data.ml_score !== null) ? `${data.ml_score}%` : 'N/A';
+
+            combinedScore.textContent = (data.confidence !== undefined && data.confidence !== null) ? `${data.confidence}%` : 'N/A';
+
+            explanation.textContent = data.explanation || "";
+
+            if (data.triggered_rules && data.triggered_rules.length > 0) {
                 triggeredRulesSection.style.display = 'block';
                 triggeredRules.innerHTML = data.triggered_rules.map(rule => `
                     <div class="rule-item ${rule.severity}">
-                        <div class="rule-name">[${rule.severity.toUpperCase()}] ${rule.name}</div>
-                        <div class="rule-evidence">${rule.evidence}</div>
+                        <div class="rule-name">[${(rule.severity || "medium").toUpperCase()}] ${rule.name}</div>
+                        <div class="rule-evidence">${rule.evidence || ""}</div>
                     </div>
                 `).join('');
             } else {
                 triggeredRulesSection.style.display = 'none';
+                triggeredRules.innerHTML = "";
             }
-            
-            // Show result with appropriate styling
+
             result.className = 'result ' + data.verdict.toLowerCase();
             result.style.display = 'block';
             result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -426,13 +506,31 @@
         function loadPhishingExample() {
             document.getElementById('sender').value = '"PayPal Security" <noreply@paypal-secure.ru>';
             document.getElementById('subject').value = 'URGENT: Your account has been suspended';
-            document.getElementById('body').value = 'Dear Customer,\n\nYour PayPal account has been suspended due to suspicious activity. Please verify your identity immediately by clicking the link below:\n\nhttp://192.168.1.1/paypal-login\n\nIf you do not verify within 24 hours, your account will be permanently closed.\n\nThank you,\nPayPal Security Team';
+            document.getElementById('body').value =
+`Dear Customer,
+
+Your PayPal account has been suspended due to suspicious activity. Please verify your identity immediately by clicking the link below:
+
+http://192.168.1.1/paypal-login
+
+If you do not verify within 24 hours, your account will be permanently closed.
+
+Thank you,
+PayPal Security Team`;
         }
 
         function loadLegitExample() {
             document.getElementById('sender').value = '"John Doe" <john.doe@company.com>';
             document.getElementById('subject').value = 'Meeting notes from today';
-            document.getElementById('body').value = 'Hi team,\n\nHere are the notes from our meeting today. Please review and let me know if I missed anything.\n\nhttps://docs.google.com/document/d/abc123\n\nBest regards,\nJohn';
+            document.getElementById('body').value =
+`Hi team,
+
+Here are the notes from our meeting today. Please review and let me know if I missed anything.
+
+https://docs.google.com/document/d/abc123
+
+Best regards,
+John`;
         }
     </script>
 </body>
