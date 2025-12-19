@@ -66,24 +66,33 @@ def analyze():
         ]
 
 
-        confidence = prob * 100
-
+        # ---- ML confidence ----
         if prob is None or math.isnan(prob):
-            confidence = 50.0
+            ml_confidence = 50.0
         else:
-            confidence = round(confidence, 2)
+            ml_confidence = round(prob * 100, 2)
 
-        normalized_rule_score = round((rule_score / 15) * 100, 1)
+        # ---- Rule-based confidence (normalized to 0–100) ----
+        MAX_RULE_SCORE = 15.0
+        rule_confidence = min((rule_score / MAX_RULE_SCORE) * 100, 100.0)
+        rule_confidence = round(rule_confidence, 1)
+
+        # ---- Combined confidence (hybrid) ----
+        confidence = round(
+            0.9 * ml_confidence + 0.1 * rule_confidence,
+            2
+        )
 
         return jsonify({
             "success": True,
             "verdict": "PHISHING" if (pred or rule_score >= 4) else "LEGITIMATE",
             "confidence": confidence,
-            "rule_score": normalized_rule_score,
-            "ml_score": confidence,
+            "rule_score": rule_confidence,
+            "ml_score": ml_confidence,
             "triggered_rules": triggered_rules,
             "explanation": "\n".join(reasons) if reasons else "No strong phishing indicators detected."
         })
+
 
     except Exception as e:
         return jsonify({
