@@ -204,7 +204,7 @@ def splitDataset(df,y,testRatio=0.2):
     return X_train, X_test, y_train, y_test
 
 def run():
-    df=loadEmailDataset("dataset/raw_dataset.csv") #change to actual file
+    df=loadEmailDataset("dataset/raw_dataset.csv") 
     df=preprocess(df)
     X=createFeatureMatrix(df).values
     y=2*(df['label']==1)-1
