@@ -16,6 +16,118 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .ocean {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.10), transparent 35%),
+                radial-gradient(circle at 80% 30%, rgba(255,255,255,0.08), transparent 40%),
+                linear-gradient(180deg, #0b1d3a 0%, #06345a 45%, #031a2f 100%);
+        }
+
+        .light-rays {
+            position: fixed;
+            inset: -20vh -20vw;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(
+                    115deg,
+                    rgba(255,255,255,0.06) 0px,
+                    rgba(255,255,255,0.00) 120px,
+                    rgba(255,255,255,0.00) 240px
+                );
+            mix-blend-mode: overlay;
+            animation: drift 12s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(-2vw) translateY(0); }
+            50% { transform: translateX(2vw) translateY(1vh); }
+            100% { transform: translateX(-2vw) translateY(0); }
+        }
+
+        .bubbles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -10vh;
+            width: 10px;
+            height: 10px;
+            border: 2px solid rgba(255,255,255,0.22);
+            border-radius: 50%;
+            opacity: 0.0;
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(0) scale(0.9); opacity: 0.0; }
+            10% { opacity: 0.25; }
+            100% { transform: translateY(-120vh) scale(1.25); opacity: 0.0; }
+        }
+
+        .fish-layer {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .fish {
+            position: absolute;
+            font-size: 46px;
+            opacity: 0.16;
+            filter: blur(0.15px);
+            animation: swim linear infinite;
+        }
+
+        @keyframes swim {
+            0% { transform: translateX(calc(100vw + 180px)) translateY(0); }
+            100% { transform: translateX(-180px) translateY(0); }
+        }
+
+        .hook {
+            position: fixed;
+            top: -10px;
+            right: 14vw;
+            width: 2px;
+            height: 38vh;
+            background: rgba(255,255,255,0.25);
+            z-index: -1;
+            pointer-events: none;
+            transform-origin: top center;
+            animation: bob 4.5s ease-in-out infinite;
+        }
+
+        .hook::after {
+            content: "🪝";
+            position: absolute;
+            bottom: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 30px;
+            opacity: 0.22;
+            filter: blur(0.2px);
+        }
+
+        @keyframes bob {
+            0% { transform: rotate(-2deg) translateY(0); }
+            50% { transform: rotate(2deg) translateY(10px); }
+            100% { transform: rotate(-2deg) translateY(0); }
         }
 
         .container {
@@ -281,10 +393,31 @@
     </style>
 </head>
 <body>
+    <div class="ocean"></div>
+    <div class="light-rays"></div>
+
+    <div class="bubbles">
+        <div class="bubble" style="left: 8%; animation-duration: 10s; animation-delay: -2s;"></div>
+        <div class="bubble" style="left: 22%; animation-duration: 13s; animation-delay: -6s;"></div>
+        <div class="bubble" style="left: 41%; animation-duration: 11s; animation-delay: -4s;"></div>
+        <div class="bubble" style="left: 63%; animation-duration: 15s; animation-delay: -9s;"></div>
+        <div class="bubble" style="left: 84%; animation-duration: 12s; animation-delay: -5s;"></div>
+    </div>
+
+    <div class="fish-layer">
+        <div class="fish" style="top: 14%; animation-duration: 18s; animation-delay: -3s;">🐟</div>
+        <div class="fish" style="top: 30%; animation-duration: 24s; animation-delay: -9s;">🐠</div>
+        <div class="fish" style="top: 46%; animation-duration: 28s; animation-delay: -7s;">🐡</div>
+        <div class="fish" style="top: 64%; animation-duration: 21s; animation-delay: -11s;">🦈</div>
+        <div class="fish" style="top: 80%; animation-duration: 32s; animation-delay: -14s;">🐟</div>
+    </div>
+
+    <div class="hook"></div>
+
     <div class="container">
         <div class="header">
             <h1>🛡️ Phishing Email Detector</h1>
-            <p>Analyze emails for potential phishing threats using AI and rule-based detection</p>
+            <p>Analyze emails for potential phishing threats using machine learning and rule-based detection.</p>
         </div>
 
         <div class="content">
