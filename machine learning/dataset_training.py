@@ -174,6 +174,7 @@ def LogisticRegL2(X,labels,initialW,maxIterations,eta,reg,threshold):
     # X: feature matrix, labels: (+/-1), initialW: initialWeights, eta: learning rate, reg: L2 regularization coefficient, threshold: when to stop
     X_bias=np.hstack([np.ones((X.shape[0],1)),X]) 
     w=initialW.copy() 
+    labels = labels.values 
     i=0
     for i in range(1,maxIterations+1):
         z=X_bias@w
@@ -203,7 +204,7 @@ def splitDataset(df,y,testRatio=0.2):
     return X_train, X_test, y_train, y_test
 
 def run():
-    df=loadEmailDataset("xxx.csv") #change to actual file
+    df=loadEmailDataset("dataset/raw_dataset.csv") #change to actual file
     df=preprocess(df)
     X=createFeatureMatrix(df).values
     y=2*(df['label']==1)-1
